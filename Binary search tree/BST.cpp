@@ -105,7 +105,7 @@ private:
         return root;
     }
 
-    Node* upperBound(Node* root, int value)
+    Node* lowerBound(Node* root, int value)
     {
         if(root == NULL)
         {
@@ -115,13 +115,13 @@ private:
         {
             return root;
         }
-        else if(root->value > value)
+        else if(root->value < value)
         {
-            return upperBound(root->left, value);
+            return lowerBound(root->right, value);
         }
         else
         {
-            Node* tmp = upperBound(root->right, value);
+            Node* tmp = lowerBound(root->left, value);
             if(tmp != NULL)
                 return tmp;
             else
@@ -165,9 +165,9 @@ public:
             return -1;
         return findMax(root)->value;
     }
-    int upperBound(int value)
+    int lowerBound(int value)
     {
-        Node* lb = upperBound(root, value);
+        Node* lb = lowerBound(root, value);
         if(lb == NULL)
             return -1;
         else return lb->value;
@@ -183,4 +183,6 @@ int main()
 {
 
 }
+
+
 
