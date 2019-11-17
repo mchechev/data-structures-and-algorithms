@@ -147,7 +147,7 @@ public:
     }
     void remove(int value)
     {
-        remove(root, value);
+        root = remove(root, value);
     }
     bool exists(int value)
     {
