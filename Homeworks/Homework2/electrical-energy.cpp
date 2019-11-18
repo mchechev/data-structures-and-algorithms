@@ -29,8 +29,7 @@ long long merge(int* a, int from, int mid, int to) {
     while (i < mid - from + 1 && j < to - mid) {
         if (l[i] <= r[j]) {
             a[from + index++] = l[i++];
-        }
-        else {
+        } else {
             res += mid - from + 1 - i;
             a[from + index++] = r[j++];
         }
