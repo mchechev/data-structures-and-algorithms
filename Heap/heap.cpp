@@ -13,11 +13,11 @@ private:
     vector<int> data;
 
     int getLeft(int pos) {
-        return (pos / 2) + 1;
+        return (pos * 2) + 1;
     }
 
     int getRight(int pos) {
-        return (pos / 2) + 2;
+        return (pos * 2) + 2;
     }
 
     int getParent(int pos) {
