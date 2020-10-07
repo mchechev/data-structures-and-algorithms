@@ -141,6 +141,59 @@ void foo(int n) {
 }
 ```
 
+## 11
+
+```c++
+int fact(n) {
+    if (n <= 1) {
+        return 1;
+    }
+    return n * fact(n - 1);
+}
+```
+
+## 12
+
+```c++
+int fibonacci(n) {
+    if (n <= 1) {
+        return 1;
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+```
+
+## 13
+
+```c++
+int sum(int n) {
+    int s = 0;
+    for (int i = 1; i < n; i++) {
+        s += i;
+    }
+    return s;
+}
+
+int sumSqr(int n) {
+    int s = 0;
+    for (int i = 1; i < n; i++) {
+        s += sum(i);
+    }
+    return s;
+}
+```
+
+## 14
+
+```c++
+int bar(int k) {
+    while (k > 0) {
+        k = k >> 1;
+    }
+}
+```
+
+
 ## Answers
 
 1. O(1)
@@ -153,3 +206,7 @@ void foo(int n) {
 8. O(2 ^ str.size())
 9. O(a.size()!)
 10. O(n*log(n))
+11. O(n)
+12. O(2^n)
+13. O(n^2)
+14. O(1)
