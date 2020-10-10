@@ -132,7 +132,7 @@ void permute(string a, int l, int r) {
 
 ```c++
 void foo(int n) {
-    for (int i = 0; i < n; i *= 2) {
+    for (int i = 1; i < n; i *= 2) {
         for (int k = 0; k < n; k++) {
             cout << i;
             cout << k;
