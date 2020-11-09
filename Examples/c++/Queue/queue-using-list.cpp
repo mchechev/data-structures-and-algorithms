@@ -19,7 +19,7 @@ public:
         if (data.size() > 0) {
             return data.front();
         } else {
-            throw std::underflow_error("Stack is empty");
+            throw std::underflow_error("Queue is empty.");
         }
     }
 
