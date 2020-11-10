@@ -41,10 +41,10 @@ public class Queue<T> {
 
     /**
      * Return the element at the front of the queue.
-     *
+     * 
+     * @throws IllegalStateException when the queue is empty.
      * @return Reference to the object.
      */
-    @SuppressWarnings("unchecked")
     public T front() {
         if (left > right) {
             throw new IllegalStateException("Queue is empty");
@@ -55,6 +55,8 @@ public class Queue<T> {
 
     /**
      * Remove an element from the front of the queue.
+     *
+     * @throws IllegalStateException when the queue is empty.
      */
     public void pop() {
         if (left > right) {
@@ -75,7 +77,7 @@ public class Queue<T> {
         pop();
         return  result;
     }
-
+    
     public int size() {
         return right - left + 1;
     }
