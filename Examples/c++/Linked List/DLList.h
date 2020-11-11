@@ -1,8 +1,11 @@
 #pragma once
 
-#include <algorithm>
 #include <utility>
+#include <iostream>
+#include <algorithm>
 
+// This macro breaks the debugger and stops the program execution at the point where it is called if the statement 'x' is false
+// IMPORTANT: If not in debug mode('DEBUG' is not defined) the macro does nothing
 #ifdef DEBUG
 	#define ASSERT(x,...) { if(!(x)){ std::cout << __VA_ARGS__ << std::endl; __debugbreak(); } }
 #else
@@ -15,21 +18,32 @@ namespace DSA
 	class DLLIterator
 	{
 	public:
-		using ValueType = typename List::ValueType;
-		using NodePtr = typename List::NodePtr;
-		using PointerType = ValueType*;
-		using RefType = ValueType&;
+		using ValueType = typename List::ListType;
+		using Node = typename List::Node;
 	public:
+		/// <summary>
+		/// Default constructor
+		/// </summary>
 		DLLIterator()
-			: m_Ptr(nullptr), m_SentinelNode(nullptr)
+			: mListNodePointer(nullptr), mListEndNode(nullptr)
 		{
 		}
 
-		DLLIterator(NodePtr ptr, NodePtr sentinelNode)
-			: m_Ptr(ptr), m_SentinelNode(sentinelNode)
+		/// <summary>
+		/// Parameterized Constructor
+		/// </summary>
+		/// <param name="ptr">Pointer to the current node of the list</param>
+		/// <param name="sentinelNode">The 'dummy' node of the list which indicates the end</param>
+		DLLIterator(Node* ptr, Node* sentinelNode)
+			: mListNodePointer(ptr), mListEndNode(sentinelNode)
 		{
 		}
 
+		/// <summary>
+		/// Returns iterator to the next element of the list
+		/// </summary>
+		/// <param name="offset">Tells how many increments should happen</param>
+		/// <returns></returns>
 		DLLIterator& Increment(int32_t offset)
 		{
 			ASSERT(offset >= 0, "Invalid offset!");
@@ -40,6 +54,11 @@ namespace DSA
 			return *this;
 		}
 
+		/// <summary>
+		/// Returns iterator to the previous element
+		/// </summary>
+		/// <param name="offset">Tells how many decrements should happen</param>
+		/// <returns></returns>
 		DLLIterator& Decrement(int32_t offset)
 		{
 			ASSERT(offset >= 0, "Invalid offset!");
@@ -50,25 +69,42 @@ namespace DSA
 			return *this;
 		}
 
-		RefType operator*()
+		/// <summary>
+		/// Dereference operator
+		/// </summary>
+		/// <returns></returns>
+		ValueType& operator*()
 		{
-			ASSERT(m_Ptr != m_SentinelNode, "Cannot dereference end iterator!");
-			return m_Ptr->Data;
+			ASSERT(mListNodePointer != mListEndNode, "Cannot dereference end iterator!");
+			return mListNodePointer->Data;
 		}
 
-		NodePtr operator->()
+		/// <summary>
+		/// Access operator
+		/// </summary>
+		/// <returns></returns>
+		Node* operator->()
 		{
-			ASSERT(m_Ptr != m_SentinelNode, "Cannot access end interator!");
-			return m_Ptr;
+			ASSERT(mListNodePointer != mListEndNode, "Cannot access end interator!");
+			return mListNodePointer;
 		}
 
+		/// <summary>
+		/// Post-increment operator
+		/// </summary>
+		/// <returns></returns>
 		DLLIterator& operator++()
 		{
-			ASSERT(m_Ptr != m_SentinelNode, "Cannot increment end iterator!");
-			m_Ptr = m_Ptr->Next;
+			ASSERT(mListNodePointer != mListEndNode, "Cannot increment end iterator!");
+			mListNodePointer = mListNodePointer->Next;
 			return *this;
 		}
 
+		/// <summary>
+		/// Pre-increment operator
+		/// </summary>
+		/// <param name=""></param>
+		/// <returns></returns>
 		DLLIterator operator++(int)
 		{
 			DLLIterator<List> iterator = *this;
@@ -76,13 +112,22 @@ namespace DSA
 			return iterator;
 		}
 
+		/// <summary>
+		/// Post-decrement operator
+		/// </summary>
+		/// <returns></returns>
 		DLLIterator& operator--()
 		{
-			ASSERT(m_Ptr->Previous != m_SentinelNode, "Cannot decrement begin iterator!");
-			m_Ptr = m_Ptr->Previous;
+			ASSERT(mListNodePointer->Previous != mListEndNode, "Cannot decrement begin iterator!");
+			mListNodePointer = mListNodePointer->Previous;
 			return *this;
 		}
 
+		/// <summary>
+		/// Pre-decrement operator
+		/// </summary>
+		/// <param name=""></param>
+		/// <returns></returns>
 		DLLIterator operator--(int)
 		{
 			DLLIterator<List> iterator = *this;
@@ -90,179 +135,238 @@ namespace DSA
 			return iterator;
 		}
 
+		/// <summary>
+		/// Comparisson operator
+		/// </summary>
+		/// <param name="rhs">Object of comparisson</param>
+		/// <returns></returns>
 		bool operator==(const DLLIterator& rhs) const
 		{
-			return m_Ptr == rhs.m_Ptr;
+			return mListNodePointer == rhs.mListNodePointer;
 		}
 
+		/// <summary>
+		/// Not-equals operator
+		/// </summary>
+		/// <param name="rhs">Object of comparisson</param>
+		/// <returns></returns>
 		bool operator!=(const DLLIterator& rhs) const
 		{
 			return !(*this == rhs);
 		}
 
-		operator NodePtr()
+		/// <summary>
+		/// Node* cast operator. Returns the iterator's actual pointer
+		/// </summary>
+		operator Node*()
 		{
-			return m_Ptr;
+			return mListNodePointer;
 		}
 	private:
-		NodePtr m_Ptr;
-		NodePtr m_SentinelNode;
+		Node* mListNodePointer;			// Pointer to a list node
+		Node* mListEndNode;				// Dummy node which indicates the end of the list and NOT THE LIST'S LAST ELEMENT
 	};
 
 
-	template<typename T>
+	template<typename DataType>
 	struct DLNode
 	{
-		using NodePtr = DLNode<T>*;
+		using Node = DLNode<DataType>;
 
-		T Data = T();
-		NodePtr Next = nullptr;
-		NodePtr Previous = nullptr;
+		DataType Data = DataType();		// Data
+		Node* Next = nullptr;			// Pointer to the next element/node
+		Node* Previous = nullptr;		// Pointer to the previous element/node
 
+		/// <summary>
+		/// Default Constructor
+		/// </summary>
 		DLNode() = default;
-		DLNode(const T& data, NodePtr prev, NodePtr next)
+
+		/// <summary>
+		/// Parameterized Constructor
+		/// </summary>
+		/// <param name="data">The value that the node will contain</param>
+		/// <param name="prev">Pointer to the new node's previous node</param>
+		/// <param name="next">Pointer to the new node's next node</param>
+		DLNode(const DataType& data, Node* prev, Node* next)
 			: Data(data), Previous(prev), Next(next) {}
-		DLNode(T&& data, NodePtr prev, NodePtr next)
+
+		/// <summary>
+		/// Constructor with rvalue reference data parameter used for utilizing move semantics(if the object type supports it)
+		/// </summary>
+		/// <param name="data">Rvalue reference(temporary object) of the value </param>
+		/// <param name="prev">Pointer to the new node's previous node</param>
+		/// <param name="next">Pointer to the new node's next node</param>
+		DLNode(DataType&& data, Node* prev, Node* next)
 			: Data(std::move(data)), Previous(prev), Next(next) {}
 	};
 
-	template<typename T>
+	template<typename DataType>
 	class DLList
 	{
 	public:
-		using ValueType = T;
-		using Node = DLNode<T>;
-		using NodePtr = DLNode<T>*;
-		using Iterator = DLLIterator<DLList<T>>;
+		using ListType = DataType;
+		using Node = DLNode<DataType>;
+		using Iterator = DLLIterator<DLList<DataType>>;
 	public:
+		/// <summary>
+		/// Default Constructor
+		/// </summary>
 		DLList()
 		{
-			m_SentinelNode = new Node();
-			m_SentinelNode->Next = m_SentinelNode;
-			m_SentinelNode->Previous = m_SentinelNode;
+			mListEndNode = new Node();
+			mListEndNode->Next = mListEndNode;
+			mListEndNode->Previous = mListEndNode;
 		}
 
+		/// <summary>
+		/// Destructor
+		/// </summary>
 		~DLList()
 		{
 			Clear();
-			delete m_SentinelNode;
+			delete mListEndNode;
 		}
 
-		void PushFront(const T& data)
+		/// <summary>
+		/// Adds an element to the beginning of the list
+		/// </summary>
+		/// <param name="data">The value of the new node</param>
+		void PushFront(const DataType& data)
 		{
-			InsertAfter(m_SentinelNode, data);
+			InsertAfter(mListEndNode, data);
 		}
 
-		void PushFront(T&& data)
+		/// <summary>
+		/// Adds an element to the beginning of the list
+		/// </summary>
+		/// <param name="data">Rvalue reference to the value(temporary object) of the new node</param>
+		void PushFront(DataType&& data)
 		{
-			InsertAfter(m_SentinelNode, std::move(data));
+			InsertAfter(mListEndNode, std::move(data));
 		}
 
+		/// <summary>
+		/// Adds an element to the end of the list
+		/// </summary>
+		/// <param name="data">The value of the new node</param>
+		void PushBack(const DataType& data)
+		{
+			InsertBefore(mListEndNode, data);
+		}
+
+		/// <summary>
+		/// Adds an element to the end of the list
+		/// </summary>
+		/// <param name="data">Rvalue reference to the value(temporary object) of the new node</param>
+		void PushBack(DataType&& data)
+		{
+			InsertBefore(mListEndNode, std::move(data));
+		}
+
+		/// <summary>
+		/// Inserts a new element on the specified position
+		/// </summary>
+		/// <param name="where">Insertion position</param>
+		/// <param name="data">The value of the new node</param>
+		void Insert(Iterator where, const DataType& data)
+		{
+			InsertBefore((Node*)where, data);
+		}
+
+		/// <summary>
+		/// Inserts a new element on the specified position
+		/// </summary>
+		/// <param name="where">Insertion position</param>
+		/// <param name="data">Rvalue reference to the value(temporary object) of the new node</param>
+		void Insert(Iterator where, DataType&& data)
+		{
+			InsertBefore((Node*)where, std::move(data));
+		}
+
+		/// <summary>
+		/// Constructs an object in-place at the beginning of the list
+		/// </summary>
+		/// <typeparam name="...Args"></typeparam>
+		/// <param name="...args">New element parameters</param>
+		/// <returns></returns>
 		template<typename... Args>
-		T& EmplaceFront(Args&&... args)
+		DataType& EmplaceFront(Args&&... args)
 		{
-			return EmplaceAfter(m_SentinelNode, std::forward<Args>(args)...);
+			return EmplaceAfter(mListEndNode, std::forward<Args>(args)...);
 		}
 
-		void PushBack(const T& data)
-		{
-			InsertBefore(m_SentinelNode, data);
-		}
-
-		void PushBack(T&& data)
-		{
-			InsertBefore(m_SentinelNode, std::move(data));
-		}
-
+		/// <summary>
+		/// Constructs an object in-place at the end of the list
+		/// </summary>
+		/// <typeparam name="...Args"></typeparam>
+		/// <param name="...args">New element parameters</param>
+		/// <returns></returns>
 		template<typename... Args>
-		T& EmplaceBack(Args&&... args)
+		DataType& EmplaceBack(Args&&... args)
 		{
-			return EmplaceBefore(m_SentinelNode, std::forward<Args>(args)...);
+			return EmplaceBefore(mListEndNode, std::forward<Args>(args)...);
 		}
 
-		void Insert(Iterator where, const T& data)
-		{
-			InsertBefore((NodePtr)where, data);
-		}
-
-		void Insert(Iterator where, T&& data)
-		{
-			InsertBefore((NodePtr)where, std::move(data));
-		}
-
+		/// <summary>
+		/// Constructs an object in-place on the specified position
+		/// </summary>
+		/// <typeparam name="...Args"></typeparam>
+		/// <param name="where">Iterator to the position of insertion</param>
+		/// <param name="...args">New element parameters</param>
+		/// <returns></returns>
 		template<typename... Args>
-		T& Emplace(Iterator where, Args&&... args)
+		DataType& Emplace(Iterator where, Args&&... args)
 		{
-			return EmplaceBefore((NodePtr)where, std::forward<Args>(args)...);
+			return EmplaceBefore((Node*)where, std::forward<Args>(args)...);
 		}
 
+		/// <summary>
+		/// Removes the first element
+		/// </summary>
 		void PopFront()
 		{
-			DeleteNode(m_SentinelNode->Next);
+			DeleteNode(mListEndNode->Next);
 		}
 
+		/// <summary>
+		/// Removes the last element
+		/// </summary>
 		void PopBack()
 		{
 			ASSERT(!Empty(), "PopBack() called on an empty list!");
-			DeleteNode(m_SentinelNode->Previous);
+			DeleteNode(mListEndNode->Previous);
 		}
 
+		/// <summary>
+		/// Removes the element on the specified position
+		/// </summary>
+		/// <param name="where">Iterator to the element to be removed</param>
 		void Erase(Iterator where)
 		{
-			ASSERT((NodePtr)where != m_SentinelNode, "Invalid Iterator");
+			ASSERT((Node*)where != mListEndNode, "Invalid Iterator");
 			DeleteNode(where);
 		}
 
-		void MoveToBack(Iterator from, Iterator to)
-		{
-			if (m_Size <= 1 || to == end())
-				return;
-
-			NodePtr startNode = (NodePtr)from;
-			NodePtr endNode = ((NodePtr)to)->Previous;
-
-			NodePtr startNodePrevious = startNode->Previous;
-
-			endNode->Next = m_SentinelNode;
-			m_SentinelNode->Previous->Next = startNode;
-			startNode->Previous = m_SentinelNode->Previous;
-
-			m_SentinelNode->Previous = endNode;
-			startNodePrevious->Next = (NodePtr)to;
-			((NodePtr)to)->Previous = startNodePrevious;
-
-		}
-
-		void Reverse()
-		{
-			NodePtr current = m_SentinelNode->Next;
-
-			while (current != m_SentinelNode)
-			{
-				std::swap(current->Next, current->Previous);
-				current = current->Previous;
-			}
-
-			std::swap(m_SentinelNode->Next, m_SentinelNode->Previous);
-			
-			m_SentinelNode->Previous->Next = m_SentinelNode;
-			m_SentinelNode->Next->Previous = m_SentinelNode;
-		}
-
+		/// <summary>
+		/// Reverses the list elements in the specified range: [from, to)
+		/// </summary>
+		/// <param name="from">Range start</param>
+		/// <param name="to">Range end</param>
 		void Reverse(Iterator from, Iterator to)
 		{
 			if (from == to)
 				return;
 
-			NodePtr beginNode = (NodePtr)from;
-			NodePtr endNode = ((NodePtr)to)->Previous;
-			NodePtr beginNodePrevious = beginNode->Previous;
-			NodePtr endNodeNext = (NodePtr)to;
+			Node* beginNode = (Node*)from;
+			Node* endNode = ((Node*)to)->Previous;
+			Node* beginNodePrevious = beginNode->Previous;
+			Node* endNodeNext = (Node*)to;
 
 			endNode->Next = nullptr;
 
-			NodePtr current = beginNode;
-			NodePtr prev = nullptr;
+			Node* current = beginNode;
+			Node* prev = nullptr;
 
 			while (current != nullptr)
 			{
@@ -275,37 +379,44 @@ namespace DSA
 			beginNode->Next = endNodeNext;
 		}
 
+		/// <summary>
+		/// Deletes every element in the list
+		/// </summary>
 		void Clear()
 		{
-			if (m_Size == 0)
+			if (mSize == 0)
 				return;
 
-			NodePtr current = m_SentinelNode->Next;
+			Node* current = mListEndNode->Next;
 
-			while (current != m_SentinelNode)
+			while (current != mListEndNode)
 			{
-				NodePtr temp = current;
+				Node* temp = current;
 				current = current->Next;
 				delete temp;
 			}
 
-			m_SentinelNode->Next = m_SentinelNode;
-			m_SentinelNode->Previous = m_SentinelNode;
+			mListEndNode->Next = mListEndNode;
+			mListEndNode->Previous = mListEndNode;
 
-			m_Size = 0;
+			mSize = 0;
 		}
 
+		/// <summary>
+		/// Resizes the list with the specified amount
+		/// </summary>
+		/// <param name="size">Number of elements</param>
 		void Resize(int32_t size)
 		{
 			ASSERT(size >= 0, "Invalid size value!");
 
-			NodePtr current = m_SentinelNode->Previous;
-			int32_t difference = size - m_Size;
+			Node* current = mListEndNode->Previous;
+			int32_t difference = size - mSize;
 
 			if (difference > 0)
 			{
 				for (size_t i = 0; i < difference; i++)
-					PushBack(T());
+					EmplaceBack();
 			}
 			else if (difference < 0)
 			{
@@ -315,87 +426,155 @@ namespace DSA
 			}
 		}
 
-		size_t Size() const { return m_Size; }
-		bool Empty() const { return m_Size == 0; }
+		/// <summary>
+		/// Returns the size of the list
+		/// </summary>
+		/// <returns></returns>
+		size_t Size() const { return mSize; }
 
-		T& Head() const { return m_SentinelNode->Next->Data; }
-		T& Tail() const { return m_SentinelNode->Previous->Data; }
+		/// <summary>
+		/// Checks if the list is empty
+		/// </summary>
+		/// <returns></returns>
+		bool Empty() const { return mSize == 0; }
 
-		Iterator begin() { return Iterator(m_SentinelNode->Next, m_SentinelNode); }
-		Iterator end() { return Iterator(m_SentinelNode, m_SentinelNode); }
+		/// <summary>
+		/// Returns the value of the first element
+		/// </summary>
+		/// <returns></returns>
+		DataType& Head() const { return mListEndNode->Next->Data; }
+
+		/// <summary>
+		/// Returns the value of the last element
+		/// </summary>
+		/// <returns></returns>
+		DataType& Tail() const { return mListEndNode->Previous->Data; }
+
+		/// <summary>
+		/// Returns an iterator to the beginning of the list
+		/// </summary>
+		/// <returns></returns>
+		Iterator begin() { return Iterator(mListEndNode->Next, mListEndNode); }
+
+		/// <summary>
+		/// Returns an iterator to the end of the list
+		/// </summary>
+		/// <returns></returns>
+		Iterator end() { return Iterator(mListEndNode, mListEndNode); }
 	private:
-		void InsertBefore(NodePtr node, const T& data)
+		/// <summary>
+		/// Inserts an element before the specified node
+		/// </summary>
+		/// <param name="node">The node of reference</param>
+		/// <param name="data">The value of the new node</param>
+		void InsertBefore(Node* node, const DataType& data)
 		{
-			NodePtr newNode = new Node(data, node->Previous, node);
+			Node* newNode = new Node(data, node->Previous, node);
 			node->Previous->Next = newNode;
 			node->Previous = newNode;
-			m_Size++;
+			mSize++;
 		}
 
-		void InsertBefore(NodePtr node, T&& data)
+		/// <summary>
+		/// Inserts an element before the specified node. This function takes rvalue reference parameter and should used for temporary DataType objects utilizing move semantics
+		/// </summary>
+		/// <param name="node">The node of reference</param>
+		/// <param name="data">The value of the new node</param>
+		void InsertBefore(Node* node, DataType&& data)
 		{
-			NodePtr newNode = new Node(std::move(data), node->Previous, node);
+			Node* newNode = new Node(std::move(data), node->Previous, node);
 			node->Previous->Next = newNode;
 			node->Previous = newNode;
-			m_Size++;
+			mSize++;
 		}
 
-		void InsertAfter(NodePtr node, const T& data)
+		/// <summary>
+		/// Inserts an element after the specified node
+		/// </summary>
+		/// <param name="node">The node of reference</param>
+		/// <param name="data">The value of the new node</param>
+		void InsertAfter(Node* node, const DataType& data)
 		{
-			NodePtr newNode = new Node(data, node, node->Next);
+			Node* newNode = new Node(data, node, node->Next);
 			node->Next->Previous = newNode;
 			node->Next = newNode;
-			m_Size++;
+			mSize++;
 		}
 
-		void InsertAfter(NodePtr node, T&& data)
+		/// <summary>
+		/// Inserts an element after the specified node. This function takes rvalue reference parameter and should used for temporary DataType objects utilizing move semantics
+		/// </summary>
+		/// <param name="node">The node of reference</param>
+		/// <param name="data">The value of the new node</param>
+		void InsertAfter(Node* node, DataType&& data)
 		{
-			NodePtr newNode = new Node(std::move(data), node, node->Next);
+			Node* newNode = new Node(std::move(data), node, node->Next);
 			node->Next->Previous = newNode;
 			node->Next = newNode;
-			m_Size++;
+			mSize++;
 		}
 
+		/// <summary>
+		/// Constructs the element in-place given its parameters before the specified node
+		/// </summary>
+		/// <typeparam name="...Args"></typeparam>
+		/// <param name="node">The node of reference</param>
+		/// <param name="...args">Element parameters</param>
+		/// <returns></returns>
 		template<typename... Args>
-		T& EmplaceBefore(NodePtr node, Args&&... args)
+		DataType& EmplaceBefore(Node* node, Args&&... args)
 		{
-			NodePtr newNode = new Node();
+			Node* newNode = new Node();
 			newNode->Previous = node->Previous;
 			newNode->Next = node;
-			new(&(newNode->Data)) T(std::forward<Args>(args)...);
+			new(&(newNode->Data)) DataType(std::forward<Args>(args)...);
 
 			node->Previous->Next = newNode;
 			node->Previous = newNode;
-			m_Size++;
+			mSize++;
 
 			return newNode->Data;
 		}
 
+		/// <summary>
+		/// Constructs the element in-place given its parameters after the specified node
+		/// </summary>
+		/// <typeparam name="...Args"></typeparam>
+		/// <param name="node">The node of reference</param>
+		/// <param name="...args">Element parameters</param>
+		/// <returns></returns>
 		template<typename... Args>
-		T& EmplaceAfter(NodePtr node, Args&&... args)
+		DataType& EmplaceAfter(Node* node, Args&&... args)
 		{
-			NodePtr newNode = new Node();
+			Node* newNode = new Node();
 			newNode->Previous = node;
 			newNode->Next = node->Next;
-			new(&(newNode->Data)) T(std::forward<Args>(args)...);
+			new(&(newNode->Data)) DataType(std::forward<Args>(args)...);
 
 			node->Next->Previous = newNode;
 			node->Next = newNode;
-			m_Size++;
+			mSize++;
 
 			return newNode->Data;
 		}
 
-		void DeleteNode(NodePtr node)
+		/// <summary>
+		/// Removes the specified node from the list
+		/// </summary>
+		/// <param name="node">Node to be removed</param>
+		void DeleteNode(Node* node)
 		{
 			node->Previous->Next = node->Next;
 			node->Next->Previous = node->Previous;
 			delete node;
 
-			m_Size--;
+			mSize--;
 		}
 	private:
-		size_t m_Size = 0;
-		NodePtr m_SentinelNode;
+		// Number of elements in the list
+		size_t mSize = 0;			
+
+		// Pointer to the end list node NOT TO THE LAST ELEMENT. This node's next is the list's first element and the previous is the list's last element
+		Node* mListEndNode;	
 	};
 }
