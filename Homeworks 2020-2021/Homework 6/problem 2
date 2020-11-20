@@ -1,0 +1,68 @@
+#include <cmath>
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include<queue>
+#include<map>
+using namespace std;
+class Node 
+{ 
+    public:
+    int left; 
+    int right; 
+    int hd; 
+    int data; 
+    Node(int data, int left, int right): data(data),right(right),left(left){}
+}; 
+vector<Node> v; // This will be our "tree", where all nodes are stored by their input index
+
+// The function with which we print the tree with "top view"
+void topview(Node root) 
+{ 
+    if(root.data==-1)  return; 
+     queue<Node>q; 
+     map<int,int> m;  
+     int hd=0; 
+     root.hd=hd; 
+       
+    q.push(root); 
+      
+    while(q.size()) 
+    { 
+        hd=root.hd; 
+        
+        if(m.count(hd)==0)  m[hd]=root.data; 
+        if(root.left!=-1) 
+        { 
+            v[root.left].hd=hd-1; 
+            q.push(v[root.left]); 
+        } 
+        if(root.right!=-1) 
+        { 
+            v[root.right].hd=hd+1; 
+            q.push(v[root.right]); 
+        } 
+        q.pop(); 
+        root=q.front();  
+    } 
+    
+    // auto is the c++ equivalent of let in javascript or just a pointer to a value of any type determinated at runtime
+     for(auto i=m.begin();i!=m.end();i++) 
+    { 
+        cout<<i->second<<" "; 
+    } 
+      
+} 
+
+int main() {
+    int n,a,b;
+    cin>>n;
+    for(int i=0;i<n;i++){
+        cin>>a>>b;
+        Node curr(i,a,b);
+        v.push_back(curr);
+    }
+    topview(v[0]);
+    return 0;
+}

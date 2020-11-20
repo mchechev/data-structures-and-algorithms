@@ -1,0 +1,155 @@
+#include <cmath>
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <queue>
+using namespace std;
+
+class BST
+{
+    struct Node
+    {
+        int value;
+        Node *left = NULL;
+        Node *right = NULL;
+        Node(int value)
+        {
+            this->value = value;
+        }
+    };
+
+    Node *root;
+
+    Node *insert(Node *t, int x)
+    {
+        if (t == NULL)
+        {
+            return new Node(x);
+        }
+        if (x < t->value)
+        {
+            t->left = insert(t->left, x);
+        }
+        else if (x > t->value)
+        {
+            t->right = insert(t->right, x);
+        }
+        return t;
+    }
+
+    Node *findMin(Node *t)
+    {
+        if (t == NULL)
+            return NULL;
+        else if (t->left == NULL)
+            return t;
+        else
+            return findMin(t->left);
+    }
+
+    Node *remove(Node *t, int x)
+    {
+        Node *temp;
+        if (t == NULL)
+            return NULL;
+
+        if (x < t->value)
+            t->left = remove(t->left, x);
+        else if (x > t->value)
+            t->right = remove(t->right, x);
+        else
+        {
+            if (t->left == NULL)
+            {
+                Node *temp = t->right;
+                delete t;
+                return temp;
+            }
+            else if (t->left == NULL)
+            {
+                Node *temp = t->left;
+                delete t;
+                return temp;
+            }
+            Node *temp = findMin(t->right);
+            t->value = temp->value;
+
+            t->right = remove(t->right, temp->value);
+        }
+        return t;
+    }
+
+    // In this function we print the tree by level
+    void printLevelOrder(Node *root)
+    {
+        if (root == NULL)
+            return;
+
+        queue<Node *> q;
+
+        q.push(root);
+
+        while (q.empty() == false)
+        {
+            int NodeCount = q.size();
+
+            while (NodeCount > 0)
+            {
+                Node *Node = q.front();
+                cout << Node->value << " ";
+                q.pop();
+                if (Node->left != NULL)
+                    q.push(Node->left);
+                if (Node->right != NULL)
+                    q.push(Node->right);
+                NodeCount--;
+            }
+        }
+    }
+
+public:
+    BST()
+    {
+        root = NULL;
+    }
+
+    void insert(int x)
+    {
+        root = insert(root, x);
+    }
+
+    void remove(int x)
+    {
+        root = remove(root, x);
+    }
+
+    void display()
+    {
+        printLevelOrder(root);
+        cout << endl;
+    }
+};
+
+int main()
+{
+    int n, k, arr[100000];
+    cin >> n >> k;
+    BST tree;
+
+    /* We insert the number both in an array and our tree 
+    so we can sort the array and delete k-th largest element */
+
+    for (int i = 0; i < n; i++)
+    {
+        cin >> arr[i];
+        tree.insert(arr[i]);
+    }
+
+    sort(arr, arr + n);
+
+    tree.remove(arr[n - k]);
+    
+    tree.display();
+    return 0;
+}

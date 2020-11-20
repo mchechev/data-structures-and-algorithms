@@ -1,0 +1,27 @@
+#include <iostream>
+#include<unordered_set>
+using namespace std;
+unordered_set<string> s; // this is collection that stores unique elements, it is basiclly a balanced binary tree (red black tree) 
+int n,q;
+
+void solve(){
+    cin>>n;
+    string a;
+    for(int i=0;i<n;i++){
+        cin>>a;
+        s.insert(a);
+    }
+    cin>>q;
+    for(int i=0;i<q;i++){
+        cin>>a;
+        if(s.find(a)!=s.end()) // if unordered_set.find(element)==unordered_set.end() that means that the element is not in the set
+        {
+            cout<<"YES"<<endl;
+        }
+        else cout<<"NO"<<endl;
+    }
+}
+int main() {
+    solve();
+    return 0;
+}
