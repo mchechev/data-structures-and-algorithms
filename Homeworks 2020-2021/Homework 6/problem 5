@@ -1,0 +1,45 @@
+#include <vector>
+#include <iostream>
+using namespace std;
+vector<int> v[1000000];
+int timeIn[1000000],timeOut[1000000];
+void dfs(int u, int parent, int& cnt)
+{
+    timeIn[u] = cnt++;
+ 
+    for (int i = 0; i < v[u].size(); i++) {
+        int curr = v[u][i];
+        if (curr != parent)
+            dfs(curr, u, cnt);
+    }
+ 
+    timeOut[u] = cnt++;
+}
+// This aproach was explained in the lecutre
+void solve(){
+    int n,a,b,q;
+    cin>>n;
+    for(int i=0;i<n-1;i++){
+        scanf("%d",&a);
+        scanf("%d",&b);
+        v[a].push_back(b);
+        v[b].push_back(a);
+    }
+
+    int cnt=0;
+
+    dfs(0, -1, cnt);
+    
+    scanf("%d",&q);
+
+    for(int i=0;i<q;i++){
+        scanf("%d",&a);
+        scanf("%d",&b);
+        if(timeIn[a] <= timeIn[b] && timeOut[b] <= timeOut[a]) printf("YES\n");
+        else printf("NO\n");
+    }
+}
+int main() { 
+    solve();
+    return 0;
+}

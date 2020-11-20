@@ -1,0 +1,47 @@
+#include <vector>
+#include <iostream>
+#include <algorithm>
+using namespace std;
+class Node
+{
+public:
+    vector<int> neighboors; // in this vector we will store all neighboors
+    int value;
+    Node() : value(1) {}
+};
+
+Node v[1000000]; // This is aggain our "tree" which stores all nodes
+
+// This function will make every nodes value correspond the number of it's descendants
+
+int sum(Node &curr)
+{
+    for (int i = 0; i < curr.neighboors.size(); i++)
+    {
+        curr.value += sum(v[curr.neighboors[i]]);
+    }
+    return curr.value;
+}
+
+void solve()
+{
+    int n, a, b;
+    cin >> n;
+    while (cin >> a >> b)
+    {
+        v[a].neighboors.push_back(b);
+    }
+
+    sum(v[0]); // we initialize the tree whith the root
+
+    for (int i = 0; i < n; i++)
+    {
+        cout << v[i].value - 1 << " "; // subtract 1 because the node is not child of itself
+    }
+    cout << endl;
+}
+int main()
+{
+    solve();
+    return 0;
+}
